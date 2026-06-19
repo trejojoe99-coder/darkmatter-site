@@ -1,3 +1,4 @@
+// build-rev: 2 — force fresh function publish (cache-bust orphaned artifacts)
 // On-demand Claude generation: market insight + manual blog post.
 const { json, insightPrompt, dailyPostPrompt, weeklyPostPrompt, callAnthropic } = require("./lib/shared");
 

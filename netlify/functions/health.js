@@ -1,3 +1,4 @@
+// build-rev: 2 — force fresh function publish (cache-bust orphaned artifacts)
 // Temporary diagnostic: verifies Netlify Blobs read+write and env presence.
 // Safe to delete once chat is confirmed working.
 const { getStore } = require("@netlify/blobs");

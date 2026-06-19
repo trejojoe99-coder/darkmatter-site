@@ -1,3 +1,4 @@
+// build-rev: 2 — force fresh function publish (cache-bust orphaned artifacts)
 // Public anonymous chat room. GET = recent messages; POST {action:send|clear}.
 const { json, readJSON, writeJSON, adminOk } = require("./lib/shared");
 

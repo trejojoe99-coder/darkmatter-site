@@ -1,3 +1,4 @@
+// build-rev: 2 — force fresh function publish (cache-bust orphaned artifacts)
 // Auto-post schedule + weekly topics. GET = read; POST {action:save} (admin).
 const { json, readJSON, writeJSON, adminOk } = require("./lib/shared");
 

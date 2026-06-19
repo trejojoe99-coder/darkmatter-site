@@ -1,3 +1,4 @@
+// build-rev: 2 — force fresh function publish (cache-bust orphaned artifacts)
 // ─────────────────────────────────────────────────────────────
 //  Dark Matter scheduler — runs every hour (Netlify Scheduled Fn).
 //  Compares the current Central time against the admin-configured

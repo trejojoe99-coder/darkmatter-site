@@ -1,3 +1,4 @@
+// build-rev: 2 — force fresh function publish (cache-bust orphaned artifacts)
 // Blog posts store. GET = list; POST {action:add|delete} (admin only).
 const { json, readJSON, writeJSON, adminOk } = require("./lib/shared");
 
