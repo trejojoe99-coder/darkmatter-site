@@ -19,6 +19,7 @@ function json(statusCode, obj) {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type",
+      "X-DM-Rev": "3",
     },
     body: JSON.stringify(obj),
   };

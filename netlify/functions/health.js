@@ -5,6 +5,7 @@ const { getStore } = require("@netlify/blobs");
 
 exports.handler = async function () {
   const out = {
+    rev: 3,
     node: process.version,
     hasAnthropicKey: !!process.env.ANTHROPIC_API_KEY,
     hasAdminPassword: !!process.env.ADMIN_PASSWORD,
