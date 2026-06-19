@@ -1,6 +1,6 @@
 // build-rev: 2 — force fresh function publish (cache-bust orphaned artifacts)
 // Auto-post schedule + weekly topics. GET = read; POST {action:save} (admin).
-const { json, readJSON, writeJSON, adminOk } = require("./lib/shared");
+const { json, readJSON, writeJSON, adminOk, initBlobs } = require("./lib/shared");
 
 const DEFAULTS = {
   morningHour: 7,      // 0-23, Central time
@@ -14,6 +14,7 @@ const DEFAULTS = {
 // Internal run-markers (lastMorning / lastAfternoon / lastWeekly) live in the
 // same blob but are not user-editable; we preserve them on save.
 exports.handler = async function (event) {
+  initBlobs(event);
   if (event.httpMethod === "OPTIONS") return json(200, {});
 
   if (event.httpMethod === "GET") {

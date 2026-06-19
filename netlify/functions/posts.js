@@ -1,6 +1,6 @@
 // build-rev: 2 — force fresh function publish (cache-bust orphaned artifacts)
 // Blog posts store. GET = list; POST {action:add|delete} (admin only).
-const { json, readJSON, writeJSON, adminOk } = require("./lib/shared");
+const { json, readJSON, writeJSON, adminOk, initBlobs } = require("./lib/shared");
 
 const SEED = [
   { id:"seed-1", tag:"ALPHA", date:"Jun 18", read:"3 min",
@@ -18,6 +18,7 @@ const SEED = [
 ];
 
 exports.handler = async function (event) {
+  initBlobs(event);
   if (event.httpMethod === "OPTIONS") return json(200, {});
 
   // GET → list posts (seed on first ever load)

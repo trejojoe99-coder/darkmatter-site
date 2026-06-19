@@ -2,9 +2,17 @@
 // ─────────────────────────────────────────────────────────────
 //  Dark Matter — shared helpers for all Netlify Functions
 // ─────────────────────────────────────────────────────────────
-const { getStore } = require("@netlify/blobs");
+const { getStore, connectLambda } = require("@netlify/blobs");
 
 const STORE_NAME = "darkmatter";
+
+// Classic (Lambda-compat) functions must wire up the Blobs environment from the
+// invocation event before getStore() will work. Call this first in each handler.
+function initBlobs(event) {
+  if (event) {
+    try { connectLambda(event); } catch (e) { /* already connected */ }
+  }
+}
 const COINGECKO =
   "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd" +
   "&ids=bitcoin,ethereum,solana,ripple,pax-gold&order=market_cap_desc" +
@@ -164,7 +172,7 @@ async function addPost(post) {
 }
 
 module.exports = {
-  json, store, readJSON, writeJSON, adminOk,
+  json, store, readJSON, writeJSON, adminOk, initBlobs,
   fetchMarketData, insightPrompt, dailyPostPrompt, weeklyPostPrompt,
   callAnthropic, parsePost, addPost,
 };

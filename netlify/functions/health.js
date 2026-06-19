@@ -1,11 +1,12 @@
 // build-rev: 2 — force fresh function publish (cache-bust orphaned artifacts)
 // Temporary diagnostic: verifies Netlify Blobs read+write and env presence.
 // Safe to delete once chat is confirmed working.
-const { getStore } = require("@netlify/blobs");
+const { getStore, connectLambda } = require("@netlify/blobs");
 
-exports.handler = async function () {
+exports.handler = async function (event) {
+  if (event) { try { connectLambda(event); } catch (e) {} }
   const out = {
-    rev: 3,
+    rev: 4,
     node: process.version,
     hasAnthropicKey: !!process.env.ANTHROPIC_API_KEY,
     hasAdminPassword: !!process.env.ADMIN_PASSWORD,

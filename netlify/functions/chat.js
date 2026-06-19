@@ -1,11 +1,12 @@
 // build-rev: 2 — force fresh function publish (cache-bust orphaned artifacts)
 // Public anonymous chat room. GET = recent messages; POST {action:send|clear}.
-const { json, readJSON, writeJSON, adminOk } = require("./lib/shared");
+const { json, readJSON, writeJSON, adminOk, initBlobs } = require("./lib/shared");
 
 const MAX_MESSAGES = 200;     // keep only the most recent N
 const MAX_LEN = 500;          // per-message character cap
 
 exports.handler = async function (event) {
+  initBlobs(event);
   if (event.httpMethod === "OPTIONS") return json(200, {});
 
   if (event.httpMethod === "GET") {

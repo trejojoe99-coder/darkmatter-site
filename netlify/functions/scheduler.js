@@ -9,7 +9,7 @@
 //  Run-markers in the config blob prevent double-posting.
 // ─────────────────────────────────────────────────────────────
 const {
-  readJSON, writeJSON, fetchMarketData,
+  readJSON, writeJSON, fetchMarketData, initBlobs,
   dailyPostPrompt, weeklyPostPrompt, callAnthropic, parsePost, addPost,
 } = require("./lib/shared");
 
@@ -55,7 +55,8 @@ async function generateWeekly(cfg) {
   return (idx + 1) % topics.length; // advance to next topic
 }
 
-const handler = async function () {
+const handler = async function (event) {
+  initBlobs(event);
   const cfg = await readJSON("config", {});
   const c = {
     morningHour: 7, afternoonHour: 15, weeklyDay: "Sun", weeklyHour: 9,
