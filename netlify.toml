@@ -1,0 +1,12 @@
+# Dark Matter — Netlify config
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+# The scheduler also declares its own "@hourly" cron via schedule() in
+# scheduler.js. This block is a redundant, explicit safeguard.
+[functions."scheduler"]
+  schedule = "@hourly"

@@ -1,0 +1,17 @@
+{
+  "name": "Dark Matter",
+  "short_name": "DarkMatter",
+  "description": "Crypto intelligence — live markets, AI briefings, anonymous chat.",
+  "start_url": "darkmatter.html",
+  "display": "standalone",
+  "background_color": "#07050A",
+  "theme_color": "#07050A",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='42' fill='%2307050A'/%3E%3Ctext x='96' y='130' font-size='120' text-anchor='middle' font-family='monospace' font-weight='700' fill='%23FF2EC4'%3EM%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

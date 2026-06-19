@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="theme-color" content="#07050A"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Dark Matter"/>
+<title>Dark Matter</title>
+<link rel="manifest" href="manifest.json"/>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg: #07050A;
+    --surface: #100D16;
+    --surface2: #1A1422;
+    --border: #2A1F33;
+    --accent: #B026FF;     /* purple */
+    --accent2: #FF2EC4;    /* neon magenta — primary signature */
+    --green: #22C55E;
+    --red: #EF4444;
+    --text: #F4EEF6;
+    --muted: #7B6A86;
+    --tag: #1E1024;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    min-height: 100dvh;
+    overscroll-behavior: none;
+  }
+
+  /* ── APP SHELL ── */
+  .app {
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .status-bar { height: env(safe-area-inset-top, 0px); background: var(--bg); }
+
+  /* ── HEADER ── */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(7,5,10,0.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #FF2EC4, #B026FF);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    cursor: pointer;
+  }
+  .logo span { color: var(--accent2); -webkit-text-fill-color: var(--accent2); }
+
+  .header-right { display: flex; align-items: center; gap: 12px; }
+  .header-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* ── SCROLL AREA ── */
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 96px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ── VIEWS ── */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  .section { padding: 20px 20px 0; }
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .view-title {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    padding: 18px 20px 0;
+  }
+  .view-subtitle { font-size: 13px; color: var(--muted); padding: 4px 20px 0; }
+
+  /* ── TICKER STRIP ── */
+  .ticker-wrap {
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    padding: 10px 0;
+    margin-bottom: 4px;
+  }
+  .ticker-track {
+    display: flex;
+    gap: 28px;
+    animation: ticker 30s linear infinite;
+    white-space: nowrap;
+    padding: 0 20px;
+  }
+  @keyframes ticker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .tick-item {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+  .tick-name { color: var(--muted); }
+  .tick-price { color: var(--text); font-weight: 700; }
+  .tick-change { font-size: 11px; }
+  .up { color: var(--green); }
+  .down { color: var(--red); }
+
+  /* ── MARKET CARDS ── */
+  .market-scroll {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding: 0 20px 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .market-scroll::-webkit-scrollbar { display: none; }
+
+  .mcard {
+    flex-shrink: 0;
+    width: 150px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.1s;
+    position: relative;
+    overflow: hidden;
+  }
+  .mcard:active { transform: scale(0.97); }
+  .mcard.active-card { border-color: var(--accent2); box-shadow: 0 0 24px rgba(255,46,196,0.12); }
+
+  .mcard-glow {
+    position: absolute;
+    top: -20px; right: -20px;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    opacity: 0.08;
+    filter: blur(20px);
+  }
+
+  .mcard-top { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .coin-icon {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Space Mono', monospace;
+    flex-shrink: 0;
+  }
+  .coin-name { font-size: 12px; font-weight: 600; }
+  .coin-sym { font-size: 10px; color: var(--muted); }
+
+  .mcard-price {
+    font-family: 'Space Mono', monospace;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .mcard-change {
+    font-size: 12px;
+    font-weight: 500;
+    display: flex; align-items: center; gap: 3px;
+  }
+
+  .sparkline { margin-top: 10px; }
+  .sparkline svg { width: 100%; height: 32px; }
+
+  .live-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 1px;
+    color: var(--green); margin-left: 8px;
+  }
+  .live-pill::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green); animation: pulse 2s ease-in-out infinite;
+  }
+
+  /* ── AI INSIGHT BOX ── */
+  .ai-box {
+    margin: 20px 20px 0;
+    background: linear-gradient(135deg, rgba(176,38,255,0.14), rgba(255,46,196,0.06));
+    border: 1px solid rgba(176,38,255,0.35);
+    border-radius: 18px;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .ai-box::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 120px; height: 120px;
+    background: var(--accent2);
+    border-radius: 50%;
+    opacity: 0.08;
+    filter: blur(30px);
+  }
+  .ai-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .ai-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent2);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+  .ai-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; letter-spacing: 2px;
+    color: var(--accent2); text-transform: uppercase;
+  }
+  .ai-text { font-size: 14px; line-height: 1.6; color: var(--text); opacity: 0.92; }
+  .ai-text.loading { color: var(--muted); font-style: italic; }
+  .ai-refresh { display: flex; align-items: center; justify-content: flex-end; margin-top: 12px; }
+  .refresh-btn {
+    font-family: 'Space Mono', monospace; font-size: 11px;
+    color: var(--accent2); background: none; border: none; cursor: pointer;
+    display: flex; align-items: center; gap: 5px; padding: 4px 0;
+  }
+  .refresh-btn:active { opacity: 0.6; }
+  .spin { display: inline-block; }
+  .spin.spinning { animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── BLOG FEED ── */
+  .blog-feed { padding: 16px 20px 0; }
+  .bcard {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.1s;
+  }
+  .bcard:active { transform: scale(0.99); border-color: var(--accent2); }
+  .bcard-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .tag {
+    background: var(--tag); color: var(--accent2);
+    font-size: 10px; font-family: 'Space Mono', monospace;
+    padding: 3px 8px; border-radius: 6px; letter-spacing: 0.5px;
+  }
+  .bdate { font-size: 11px; color: var(--muted); margin-left: auto; }
+  .bcard-title { font-size: 16px; font-weight: 600; line-height: 1.35; margin-bottom: 8px; }
+  .bcard-excerpt { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 12px; }
+  .bcard-footer { display: flex; align-items: center; justify-content: space-between; }
+  .author { display: flex; align-items: center; gap: 8px; }
+  .avatar {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #fff;
+  }
+  .author-name { font-size: 12px; color: var(--muted); }
+  .read-time { font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; }
+  .feed-empty { text-align: center; color: var(--muted); font-size: 13px; padding: 40px 20px; }
+
+  /* ── CHAT ── */
+  .chat-gate {
+    padding: 60px 24px;
+    text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
+  }
+  .chat-gate h3 { font-size: 20px; font-weight: 700; }
+  .chat-gate p { font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 280px; }
+  .handle-input {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 16px; color: var(--text);
+    font-family: 'Space Mono', monospace; font-size: 16px;
+    text-align: center; width: 240px; outline: none;
+  }
+  .handle-input:focus { border-color: var(--accent2); }
+  .gate-btn {
+    background: linear-gradient(135deg, #FF2EC4, #B026FF); color: #fff;
+    border: none; border-radius: 12px; padding: 14px 28px;
+    font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700;
+    cursor: pointer; width: 240px;
+  }
+  .gate-btn:active { opacity: 0.85; }
+
+  .chat-room { display: none; }
+  .chat-room.active { display: block; }
+
+  .chat-messages {
+    padding: 16px 16px 12px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .chat-empty { text-align: center; color: var(--muted); font-size: 13px; padding: 40px 0; }
+  .msg { max-width: 80%; }
+  .msg-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 3px; }
+  .msg-handle { font-size: 12px; font-weight: 700; color: var(--accent2); font-family: 'Space Mono', monospace; }
+  .msg-time { font-size: 10px; color: var(--muted); }
+  .msg-bubble {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 4px 14px 14px 14px; padding: 10px 13px;
+    font-size: 14px; line-height: 1.45; word-wrap: break-word;
+  }
+  .msg.mine { align-self: flex-end; }
+  .msg.mine .msg-head { justify-content: flex-end; }
+  .msg.mine .msg-handle { color: var(--accent); }
+  .msg.mine .msg-bubble {
+    background: linear-gradient(135deg, rgba(255,46,196,0.18), rgba(176,38,255,0.12));
+    border-color: rgba(255,46,196,0.35);
+    border-radius: 14px 4px 14px 14px;
+  }
+
+  .chat-input-bar {
+    display: none;
+    position: fixed;
+    bottom: calc(64px + env(safe-area-inset-bottom));
+    left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 430px;
+    padding: 10px 12px;
+    background: rgba(7,5,10,0.96);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    gap: 8px; align-items: center;
+    z-index: 90;
+  }
+  body[data-tab="chat"].chat-ready .chat-input-bar { display: flex; }
+  body[data-tab="chat"].chat-ready .chat-room.active { padding-bottom: 70px; }
+  .chat-text-input {
+    flex: 1; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 22px; padding: 11px 16px; color: var(--text);
+    font-family: 'Space Grotesk', sans-serif; font-size: 14px; outline: none;
+  }
+  .chat-text-input:focus { border-color: var(--accent2); }
+  .chat-send {
+    width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%;
+    background: linear-gradient(135deg, #FF2EC4, #B026FF); color: #fff;
+    border: none; font-size: 17px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .chat-send:active { opacity: 0.8; }
+  .chat-send:disabled { opacity: 0.4; }
+  .chat-handle-bar {
+    font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted);
+    padding: 10px 18px 0; display: flex; align-items: center; gap: 8px;
+  }
+  .chat-handle-bar b { color: var(--accent2); }
+  .chat-handle-bar button {
+    margin-left: auto; background: none; border: none; color: var(--muted);
+    font-size: 11px; cursor: pointer; text-decoration: underline;
+  }
+
+  /* ── MARKETPLACE (preview) ── */
+  .mp-hero {
+    margin: 20px 20px 0; padding: 28px 22px;
+    border: 1px solid var(--border); border-radius: 20px;
+    background: linear-gradient(135deg, rgba(176,38,255,0.10), rgba(255,46,196,0.04));
+    text-align: center;
+  }
+  .mp-hero .mp-icon { font-size: 40px; }
+  .mp-hero h3 { font-size: 19px; font-weight: 700; margin: 12px 0 8px; }
+  .mp-hero p { font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 300px; margin: 0 auto; }
+  .mp-badge {
+    display: inline-block; margin-top: 14px;
+    background: var(--tag); color: var(--accent2);
+    font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px;
+    padding: 5px 12px; border-radius: 8px;
+  }
+  .mp-list { padding: 18px 20px 0; }
+  .mp-item {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 16px; margin-bottom: 10px; opacity: 0.85;
+  }
+  .mp-item .mp-emoji {
+    width: 44px; height: 44px; border-radius: 12px; background: var(--surface2);
+    display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+  }
+  .mp-item h4 { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+  .mp-item p { font-size: 12px; color: var(--muted); line-height: 1.4; }
+
+  /* ── PROFILE ── */
+  .profile-head {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 32px 20px 20px; gap: 12px;
+  }
+  .profile-avatar {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; font-weight: 700; color: #fff;
+    font-family: 'Space Mono', monospace;
+    box-shadow: 0 0 30px rgba(255,46,196,0.25);
+  }
+  .profile-handle { font-size: 18px; font-weight: 700; }
+  .profile-tagline { font-size: 12px; color: var(--muted); }
+  .profile-section { padding: 8px 20px 0; }
+  .prow {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 15px 16px; margin-bottom: 10px;
+    cursor: pointer; transition: border-color 0.15s;
+  }
+  .prow:active { border-color: var(--accent2); }
+  .prow .prow-ico { font-size: 18px; }
+  .prow .prow-label { font-size: 14px; font-weight: 500; }
+  .prow .prow-sub { font-size: 11px; color: var(--muted); }
+  .prow .prow-arrow { margin-left: auto; color: var(--muted); }
+  .profile-foot { text-align: center; font-size: 11px; color: var(--muted); padding: 24px 20px; font-family: 'Space Mono', monospace; }
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 100%; max-width: 430px;
+    background: rgba(7,5,10,0.94);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    padding: 10px 0 max(10px, env(safe-area-inset-bottom));
+    display: flex; z-index: 100;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+    cursor: pointer; padding: 4px 0; transition: opacity 0.15s;
+  }
+  .nav-item:active { opacity: 0.6; }
+  .nav-icon { font-size: 20px; line-height: 1; position: relative; }
+  .nav-label { font-size: 10px; color: var(--muted); font-weight: 500; transition: color 0.15s; }
+  .nav-item.active .nav-label { color: var(--accent2); }
+  .nav-pip {
+    position: absolute; bottom: -3px; left: 50%; transform: translateX(-50%);
+    width: 4px; height: 4px; border-radius: 50%;
+    background: var(--accent2); opacity: 0; transition: opacity 0.15s;
+  }
+  .nav-item.active .nav-pip { opacity: 1; }
+
+  /* ── ADMIN PANEL ── */
+  .admin-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(8px);
+    z-index: 300; display: none; align-items: flex-end;
+  }
+  .admin-overlay.open { display: flex; }
+  .admin-sheet {
+    width: 100%; max-width: 430px; margin: 0 auto;
+    background: #140A1A;
+    border-radius: 24px 24px 0 0;
+    border-top: 1px solid #3A1F4A;
+    padding: 20px 20px max(20px, env(safe-area-inset-bottom));
+    max-height: 90dvh; overflow-y: auto;
+    animation: slideUp 0.3s ease;
+  }
+  .admin-handle { width: 36px; height: 4px; border-radius: 2px; background: #3A1F4A; margin: 0 auto 20px; }
+  .admin-title {
+    font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 2px;
+    color: var(--accent2); text-transform: uppercase; margin-bottom: 20px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .admin-btn {
+    width: 100%; padding: 15px; border-radius: 14px; border: none;
+    font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700;
+    cursor: pointer; margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .admin-btn:active { opacity: 0.8; transform: scale(0.98); }
+  .admin-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .admin-btn-primary { background: linear-gradient(135deg, #FF2EC4, #B026FF); color: white; }
+  .admin-btn-secondary { background: #1A1422; color: var(--text); border: 1px solid #2A1F33; }
+  .admin-btn-danger { background: #2A0F18; color: #FF6B8A; border: 1px solid #4A1F2E; }
+  .admin-status {
+    font-size: 13px; color: var(--muted); text-align: center;
+    margin: 10px 0; min-height: 18px; font-family: 'Space Mono', monospace;
+  }
+  .admin-status.success { color: var(--green); }
+  .admin-status.error { color: var(--red); }
+  .admin-divider { border: none; border-top: 1px solid #2A1F33; margin: 16px 0; }
+  .admin-label {
+    font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace;
+    letter-spacing: 1px; margin-bottom: 10px; text-transform: uppercase;
+  }
+  .admin-field { margin-bottom: 14px; }
+  .admin-field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .admin-input, .admin-textarea, .admin-select {
+    width: 100%; background: #1A1422; border: 1px solid #2A1F33; border-radius: 10px;
+    padding: 11px 13px; color: var(--text); font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px; outline: none;
+  }
+  .admin-input:focus, .admin-textarea:focus, .admin-select:focus { border-color: var(--accent2); }
+  .admin-textarea { min-height: 84px; resize: vertical; font-family: 'Space Mono', monospace; font-size: 13px; line-height: 1.6; }
+  .admin-row2 { display: flex; gap: 10px; }
+  .admin-row2 > * { flex: 1; }
+  .admin-post-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px; background: #1A1422; border-radius: 10px; margin-bottom: 6px;
+  }
+  .admin-post-title { font-size: 12px; color: var(--text); flex: 1; margin-right: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .admin-post-tag { font-size: 9px; font-family: 'Space Mono', monospace; color: var(--accent2); background: var(--tag); padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
+  .admin-delete { background: none; border: none; color: #4A2F5A; font-size: 16px; cursor: pointer; margin-left: 8px; padding: 0 4px; flex-shrink: 0; transition: color 0.15s; }
+  .admin-delete:active { color: var(--red); }
+
+  /* password screen */
+  .pw-screen {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.92);
+    backdrop-filter: blur(12px);
+    z-index: 400; display: none;
+    align-items: center; justify-content: center; flex-direction: column; gap: 16px;
+  }
+  .pw-screen.open { display: flex; }
+  .pw-label { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 3px; color: var(--accent2); text-transform: uppercase; }
+  .pw-input {
+    background: #1A1422; border: 1px solid #3A1F4A; border-radius: 12px;
+    padding: 14px 18px; color: var(--text); font-family: 'Space Mono', monospace;
+    font-size: 20px; letter-spacing: 6px; text-align: center; width: 200px; outline: none;
+  }
+  .pw-input:focus { border-color: var(--accent2); }
+  .pw-hint { font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; }
+  .pw-cancel { background: none; border: none; color: var(--muted); font-family: 'Space Grotesk', sans-serif; font-size: 14px; cursor: pointer; margin-top: 4px; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(6px);
+    z-index: 200; display: none; align-items: flex-end;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-sheet {
+    width: 100%; max-width: 430px; margin: 0 auto;
+    background: var(--surface);
+    border-radius: 24px 24px 0 0; border-top: 1px solid var(--border);
+    padding: 20px 20px max(20px, env(safe-area-inset-bottom));
+    max-height: 85dvh; overflow-y: auto; animation: slideUp 0.3s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .modal-handle { width: 36px; height: 4px; border-radius: 2px; background: var(--border); margin: 0 auto 20px; }
+  .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+  .modal-body { font-size: 14px; line-height: 1.7; color: rgba(244,238,246,0.82); }
+  .modal-close {
+    margin-top: 20px; width: 100%; padding: 14px;
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 14px;
+    color: var(--text); font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer;
+  }
+  .modal-close:active { opacity: 0.7; }
+</style>
+</head>
+<body data-tab="markets">
+<div class="app">
+  <div class="status-bar"></div>
+
+  <header>
+    <div class="logo" id="logo">Dark<span>Matter</span></div>
+    <div class="header-right">
+      <div class="header-title" id="headerTitle">Markets</div>
+    </div>
+  </header>
+
+  <div class="scroll-area">
+
+    <!-- ════════ MARKETS ════════ -->
+    <section class="view active" id="view-markets">
+      <div class="ticker-wrap">
+        <div class="ticker-track" id="tickerTrack"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Markets <span class="live-pill">LIVE</span></div>
+      </div>
+      <div class="market-scroll" id="marketScroll"></div>
+
+      <div class="ai-box">
+        <div class="ai-header">
+          <div class="ai-dot"></div>
+          <div class="ai-label">DM Market Intel</div>
+        </div>
+        <div class="ai-text loading" id="aiText">Analyzing market conditions...</div>
+        <div class="ai-refresh">
+          <button class="refresh-btn" id="refreshBtn" onclick="fetchAIInsight()">
+            <span class="spin" id="spinIcon">↻</span> Refresh
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════ BLOG ════════ -->
+    <section class="view" id="view-blog">
+      <div class="view-title">The Signal</div>
+      <div class="view-subtitle">AI briefings + deep dives. Updated daily.</div>
+      <div class="blog-feed">
+        <div id="blogFeed"><div class="feed-empty">Loading posts…</div></div>
+      </div>
+    </section>
+
+    <!-- ════════ CHAT ════════ -->
+    <section class="view" id="view-chat">
+      <!-- gate (no handle yet) -->
+      <div class="chat-gate" id="chatGate">
+        <h3>💬 Enter the room</h3>
+        <p>Anonymous. No phone, no email, no KYC. Pick a handle and start talking.</p>
+        <input class="handle-input" id="handleInput" maxlength="18" placeholder="@yourhandle" />
+        <button class="gate-btn" onclick="enterChat()">Enter Chat</button>
+      </div>
+      <!-- room -->
+      <div class="chat-room" id="chatRoom">
+        <div class="chat-handle-bar">
+          you're <b id="myHandle">@anon</b>
+          <button onclick="changeHandle()">change</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+          <div class="chat-empty">No messages yet. Say something.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════ MARKETPLACE ════════ -->
+    <section class="view" id="view-market">
+      <div class="mp-hero">
+        <div class="mp-icon">🛒</div>
+        <h3>P2P Marketplace</h3>
+        <p>Buy, sell, and trade goods and services. Pay in crypto. No middlemen, no ID, no chargebacks.</p>
+        <div class="mp-badge">COMING IN PHASE 3</div>
+      </div>
+      <div class="mp-list">
+        <div class="section-label">What's coming</div>
+        <div class="mp-item">
+          <div class="mp-emoji">🔒</div>
+          <div><h4>Crypto escrow</h4><p>Funds held in escrow until both sides confirm. No trust required.</p></div>
+        </div>
+        <div class="mp-item">
+          <div class="mp-emoji">⭐</div>
+          <div><h4>Anonymous reputation</h4><p>Build a track record without ever revealing who you are.</p></div>
+        </div>
+        <div class="mp-item">
+          <div class="mp-emoji">🌐</div>
+          <div><h4>Global listings</h4><p>Goods and services, peer to peer, settled in crypto.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════ PROFILE ════════ -->
+    <section class="view" id="view-profile">
+      <div class="profile-head">
+        <div class="profile-avatar" id="profileAvatar">?</div>
+        <div class="profile-handle" id="profileHandle">Not in chat yet</div>
+        <div class="profile-tagline">Dark Matter member</div>
+      </div>
+      <div class="profile-section">
+        <div class="prow" onclick="profileSetHandle()">
+          <div class="prow-ico">🪪</div>
+          <div><div class="prow-label">Your handle</div><div class="prow-sub" id="profileHandleSub">Set the name you use in chat</div></div>
+          <div class="prow-arrow">›</div>
+        </div>
+        <div class="prow" onclick="setTab('chat')">
+          <div class="prow-ico">💬</div>
+          <div><div class="prow-label">Go to chat</div><div class="prow-sub">Jump into the anonymous room</div></div>
+          <div class="prow-arrow">›</div>
+        </div>
+        <div class="prow" onclick="installHint()">
+          <div class="prow-ico">📲</div>
+          <div><div class="prow-label">Install app</div><div class="prow-sub">Add Dark Matter to your home screen</div></div>
+          <div class="prow-arrow">›</div>
+        </div>
+        <div class="prow" onclick="openPwScreen()">
+          <div class="prow-ico">🔐</div>
+          <div><div class="prow-label">Admin access</div><div class="prow-sub">Owner only</div></div>
+          <div class="prow-arrow">›</div>
+        </div>
+      </div>
+      <div class="profile-foot">DARK MATTER · v0.2 · built in chicago</div>
+    </section>
+
+  </div>
+
+  <!-- CHAT INPUT (only shows on chat tab) -->
+  <div class="chat-input-bar">
+    <input class="chat-text-input" id="chatTextInput" maxlength="500" placeholder="Type a message…" />
+    <button class="chat-send" id="chatSend" onclick="sendChat()">↑</button>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <div class="nav-item active" data-tab="markets" onclick="setTab('markets')">
+      <div class="nav-icon">📊<div class="nav-pip"></div></div><div class="nav-label">Markets</div>
+    </div>
+    <div class="nav-item" data-tab="blog" onclick="setTab('blog')">
+      <div class="nav-icon">✍️<div class="nav-pip"></div></div><div class="nav-label">Blog</div>
+    </div>
+    <div class="nav-item" data-tab="chat" onclick="setTab('chat')">
+      <div class="nav-icon">💬<div class="nav-pip"></div></div><div class="nav-label">Chat</div>
+    </div>
+    <div class="nav-item" data-tab="market" onclick="setTab('market')">
+      <div class="nav-icon">🛒<div class="nav-pip"></div></div><div class="nav-label">Market</div>
+    </div>
+    <div class="nav-item" data-tab="profile" onclick="setTab('profile')">
+      <div class="nav-icon">👤<div class="nav-pip"></div></div><div class="nav-label">Profile</div>
+    </div>
+  </nav>
+</div>
+
+<!-- PASSWORD SCREEN -->
+<div class="pw-screen" id="pwScreen">
+  <div class="pw-label">🔐 Admin Access</div>
+  <input class="pw-input" id="pwInput" type="password" maxlength="6" placeholder="••••••" oninput="checkPassword(this.value)"/>
+  <div class="pw-hint">Enter your 6-digit code</div>
+  <button class="pw-cancel" onclick="closePwScreen()">Cancel</button>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="admin-overlay" id="adminOverlay">
+  <div class="admin-sheet">
+    <div class="admin-handle"></div>
+    <div class="admin-title">⚡ Dark Matter Admin</div>
+
+    <button class="admin-btn admin-btn-primary" id="generateBtn" onclick="generateDailyPost()">
+      <span id="generateIcon">🤖</span>
+      <span id="generateLabel">Generate Market Update Now</span>
+    </button>
+    <div class="admin-status" id="adminStatus"></div>
+
+    <hr class="admin-divider"/>
+
+    <div class="admin-label">⏰ Auto-post schedule (Central time)</div>
+    <div class="admin-row2">
+      <div class="admin-field">
+        <label>Morning brief</label>
+        <select class="admin-select" id="cfgMorning"></select>
+      </div>
+      <div class="admin-field">
+        <label>Afternoon brief</label>
+        <select class="admin-select" id="cfgAfternoon"></select>
+      </div>
+    </div>
+    <div class="admin-row2">
+      <div class="admin-field">
+        <label>Weekly blog — day</label>
+        <select class="admin-select" id="cfgWeeklyDay"></select>
+      </div>
+      <div class="admin-field">
+        <label>Weekly blog — time</label>
+        <select class="admin-select" id="cfgWeeklyHour"></select>
+      </div>
+    </div>
+    <div class="admin-field">
+      <label>Weekly blog topics (one per line — Claude picks the next each week)</label>
+      <textarea class="admin-textarea" id="cfgTopics" placeholder="Self-custody best practices&#10;How Solana fees stay near zero&#10;Reading on-chain whale flows"></textarea>
+    </div>
+    <button class="admin-btn admin-btn-secondary" onclick="saveConfig()">💾 Save schedule & topics</button>
+    <div class="admin-status" id="cfgStatus"></div>
+
+    <hr class="admin-divider"/>
+
+    <div class="admin-label">📝 Manage posts</div>
+    <div id="adminPostList"></div>
+
+    <hr class="admin-divider"/>
+
+    <div class="admin-label">💬 Chat moderation</div>
+    <button class="admin-btn admin-btn-danger" onclick="clearChat()">🧹 Clear all chat messages</button>
+    <div class="admin-status" id="chatModStatus"></div>
+
+    <hr class="admin-divider"/>
+    <button class="admin-btn admin-btn-secondary" onclick="closeAdmin()">Close Admin</button>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-body" id="modalBody"></div>
+    <button class="modal-close" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+<script>
+const API = '/.netlify/functions';
+
+// ─────────────────────────────────────────────
+//  COIN META  (icons + colors; prices are live)
+// ─────────────────────────────────────────────
+const COIN_META = {
+  bitcoin:   { sym: 'BTC',  icon: '₿', color: '#F7931A' },
+  ethereum:  { sym: 'ETH',  icon: 'Ξ', color: '#627EEA' },
+  solana:    { sym: 'SOL',  icon: '◎', color: '#9945FF' },
+  ripple:    { sym: 'XRP',  icon: '✕', color: '#00AAE4' },
+  'pax-gold':{ sym: 'PAXG', icon: '✦', color: '#E8D48B' },
+};
+let coins = [];
+
+function fmt(n) {
+  if (n == null || isNaN(n)) return '—';
+  if (n >= 1000) return '$' + n.toLocaleString('en-US', {maximumFractionDigits: 0});
+  if (n >= 1)    return '$' + n.toFixed(2);
+  return '$' + n.toFixed(4);
+}
+
+// ── SECURE CLAUDE CALL → Netlify Function ──
+async function callClaude(type, marketData, extra) {
+  const res = await fetch(`${API}/claude`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type, marketData, ...(extra || {}) }),
+  });
+  if (!res.ok) throw new Error('Function error ' + res.status);
+  const data = await res.json();
+  return data.text;
+}
+
+// ─────────────────────────────────────────────
+//  LIVE PRICES (CoinGecko) + auto refresh
+// ─────────────────────────────────────────────
+async function fetchMarkets() {
+  try {
+    const res = await fetch(
+      'https://api.coingecko.com/api/v3/coins/markets' +
+      '?vs_currency=usd&ids=bitcoin,ethereum,solana,ripple,pax-gold' +
+      '&order=market_cap_desc&sparkline=true&price_change_percentage=24h'
+    );
+    const data = await res.json();
+    coins = data.map(c => ({
+      id: c.id,
+      sym: COIN_META[c.id]?.sym || c.symbol.toUpperCase(),
+      name: c.name,
+      icon: COIN_META[c.id]?.icon || c.symbol[0].toUpperCase(),
+      color: COIN_META[c.id]?.color || '#888',
+      price: c.current_price,
+      change: parseFloat(c.price_change_percentage_24h?.toFixed(2) || 0),
+      spark: c.sparkline_in_7d?.price?.slice(-14) || [],
+    }));
+  } catch (e) {
+    coins = [
+      { sym:'BTC', name:'Bitcoin',  icon:'₿', color:'#F7931A', price:104820, change:2.4,  spark:[95,98,96,100,99,103,105], id:'bitcoin' },
+      { sym:'ETH', name:'Ethereum', icon:'Ξ', color:'#627EEA', price:3841,   change:-1.2, spark:[42,40,41,39,38,40,38],   id:'ethereum' },
+      { sym:'SOL', name:'Solana',   icon:'◎', color:'#9945FF', price:178,    change:5.8,  spark:[155,160,165,170,172,178,180], id:'solana' },
+      { sym:'XRP', name:'XRP',      icon:'✕', color:'#00AAE4', price:2.43,   change:0.9,  spark:[2.3,2.35,2.38,2.4,2.42,2.43,2.44], id:'ripple' },
+      { sym:'PAXG',name:'PAX Gold', icon:'✦', color:'#E8D48B', price:3402,   change:0.3,  spark:[3380,3390,3395,3400,3398,3402,3405], id:'pax-gold' },
+    ];
+  }
+  buildTicker();
+  buildMarkets();
+}
+
+function buildTicker() {
+  const items = [...coins, ...coins].map(c =>
+    `<div class="tick-item">
+      <span class="tick-name">${c.sym}</span>
+      <span class="tick-price">${fmt(c.price)}</span>
+      <span class="tick-change ${c.change >= 0 ? 'up' : 'down'}">${c.change >= 0 ? '▲' : '▼'} ${Math.abs(c.change)}%</span>
+    </div>`
+  ).join('');
+  document.getElementById('tickerTrack').innerHTML = items;
+}
+
+function sparkSVG(data, up) {
+  if (!data || data.length < 2) return '';
+  const w = 118, h = 32;
+  const min = Math.min(...data), max = Math.max(...data);
+  const pts = data.map((v,i) => {
+    const x = (i / (data.length - 1)) * w;
+    const y = h - ((v - min) / (max - min || 1)) * (h - 4) - 2;
+    return `${x},${y}`;
+  });
+  const color = up ? '#22C55E' : '#EF4444';
+  return `<svg viewBox="0 0 ${w} ${h}" fill="none"><path d="M${pts.join('L')}" stroke="${color}" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
+}
+
+function buildMarkets() {
+  const el = document.getElementById('marketScroll');
+  el.innerHTML = coins.map((c, i) => `
+    <div class="mcard ${i===0?'active-card':''}" onclick="openCoinModal(${i})">
+      <div class="mcard-glow" style="background:${c.color}"></div>
+      <div class="mcard-top">
+        <div class="coin-icon" style="background:${c.color}22;color:${c.color}">${c.icon}</div>
+        <div><div class="coin-name">${c.sym}</div><div class="coin-sym">${c.name}</div></div>
+      </div>
+      <div class="mcard-price">${fmt(c.price)}</div>
+      <div class="mcard-change ${c.change >= 0 ? 'up' : 'down'}">${c.change >= 0 ? '▲' : '▼'} ${Math.abs(c.change)}%</div>
+      <div class="sparkline">${sparkSVG(c.spark, c.change >= 0)}</div>
+    </div>`).join('');
+}
+
+// ── AI INSIGHT ──
+async function fetchAIInsight() {
+  const el = document.getElementById('aiText');
+  const spin = document.getElementById('spinIcon');
+  el.textContent = 'Analyzing market conditions...';
+  el.className = 'ai-text loading';
+  spin.classList.add('spinning');
+  try {
+    const marketData = coins.length ? coins.map(c => ({
+      symbol: c.sym, name: c.name, current_price: c.price, price_change_percentage_24h: c.change,
+    })) : [];
+    const text = await callClaude('market_insight', marketData);
+    el.textContent = text;
+    el.className = 'ai-text';
+  } catch (e) {
+    el.textContent = 'Could not load insight — tap refresh to try again.';
+    el.className = 'ai-text';
+  }
+  spin.classList.remove('spinning');
+}
+
+// ─────────────────────────────────────────────
+//  BLOG  (loaded from server storage)
+// ─────────────────────────────────────────────
+const SEED_POSTS = [
+  { id:'seed-1', tag:'ALPHA', date:'Jun 18', read:'3 min',
+    title:'Why self-custody is the only real answer in 2025',
+    excerpt:'Exchanges fail. Banks freeze accounts. The only wallet that can\'t be seized is the one only you control.',
+    body:'Self-custody means you hold your own private keys — no exchange, no third party between you and your money.\n\nThe FTX collapse wiped out billions because users trusted a platform. Ledger, Trezor, Tangem — these aren\'t just hardware, they\'re financial independence in physical form.\n\nStart with a hardware wallet. Write your seed phrase on steel, not paper. Test a small recovery before going all-in. That\'s the whole playbook.' },
+  { id:'seed-2', tag:'MARKET', date:'Jun 17', read:'4 min',
+    title:'SOL at $178: is the Solana run just getting started?',
+    excerpt:'Network activity is up 40% month over month. Developer count is at an all-time high. The on-chain data doesn\'t lie.',
+    body:'Solana\'s comeback from the FTX implosion is one of the most underrated stories in crypto.\n\nAt $178 today, it\'s still well below its 2021 ATH of $260. But the fundamentals are stronger than ever — transaction fees are near zero, throughput is high, and the developer ecosystem is the most active it\'s been.\n\nKey catalysts to watch: Firedancer mainnet upgrade, continued DePIN growth, and any spot ETF approval news.' },
+  { id:'seed-3', tag:'GUIDE', date:'Jun 15', read:'5 min',
+    title:'Steel seed backup: the $30 upgrade that protects everything',
+    excerpt:'Paper burns. Metal doesn\'t. Here\'s exactly how to back up your seed phrase the right way.',
+    body:'Your seed phrase is the master key to everything. Paper burns at 233°C. Floods destroy ink. A house fire takes it all.\n\nCryptosteel Capsule and steel plates are the two best options. You stamp your 24 words into stainless steel — fire resistant, waterproof, and nearly indestructible.\n\nStore it somewhere separate from your hardware wallet. A fireproof safe works. A safety deposit box works. Anywhere only you know about works.' },
+];
+let posts = [];
+
+async function loadPosts() {
+  try {
+    const res = await fetch(`${API}/posts`);
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    posts = (data.posts && data.posts.length) ? data.posts : SEED_POSTS;
+  } catch (e) {
+    posts = SEED_POSTS; // graceful fallback (e.g. opened without backend)
+  }
+  buildBlog();
+}
+
+function buildBlog() {
+  const el = document.getElementById('blogFeed');
+  if (!posts.length) { el.innerHTML = '<div class="feed-empty">No posts yet.</div>'; return; }
+  el.innerHTML = posts.map((p, i) => `
+    <div class="bcard" onclick="openPost(${i})">
+      <div class="bcard-meta">
+        <span class="tag">${p.tag}</span>
+        <span class="bdate">${p.date}</span>
+      </div>
+      <div class="bcard-title">${p.title}</div>
+      <div class="bcard-excerpt">${p.excerpt}</div>
+      <div class="bcard-footer">
+        <div class="author"><div class="avatar">DM</div><div class="author-name">@darkmatter</div></div>
+        <div class="read-time">${p.read || '2 min'} read</div>
+      </div>
+    </div>`).join('');
+}
+
+// ─────────────────────────────────────────────
+//  CHAT  (public anonymous room)
+// ─────────────────────────────────────────────
+let myHandle = localStorage.getItem('dm_handle') || '';
+let chatTimer = null;
+let lastChatRender = '';
+
+function refreshChatGate() {
+  const gate = document.getElementById('chatGate');
+  const room = document.getElementById('chatRoom');
+  if (myHandle) {
+    gate.style.display = 'none';
+    room.classList.add('active');
+    document.body.classList.add('chat-ready');
+    document.getElementById('myHandle').textContent = myHandle;
+  } else {
+    gate.style.display = 'flex';
+    room.classList.remove('active');
+    document.body.classList.remove('chat-ready');
+  }
+}
+
+function normHandle(v) {
+  v = (v || '').trim().replace(/^@+/, '').replace(/\s+/g, '_').slice(0, 18);
+  return v ? '@' + v : '';
+}
+
+function enterChat() {
+  const h = normHandle(document.getElementById('handleInput').value);
+  if (!h || h.length < 2) { document.getElementById('handleInput').style.borderColor = '#EF4444'; return; }
+  myHandle = h;
+  localStorage.setItem('dm_handle', myHandle);
+  refreshChatGate();
+  updateProfile();
+  loadChat();
+}
+
+function changeHandle() {
+  const h = normHandle(prompt('New handle:', myHandle));
+  if (h && h.length >= 2) {
+    myHandle = h;
+    localStorage.setItem('dm_handle', myHandle);
+    refreshChatGate();
+    updateProfile();
+  }
+}
+
+function escapeHtml(s) {
+  return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function fmtTime(ts) {
+  try {
+    return new Date(ts).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  } catch (e) { return ''; }
+}
+
+async function loadChat() {
+  try {
+    const res = await fetch(`${API}/chat`);
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    renderChat(data.messages || []);
+  } catch (e) {
+    const box = document.getElementById('chatMessages');
+    if (!box.dataset.loaded) box.innerHTML = '<div class="chat-empty">Chat needs the backend deployed (Netlify). It\'ll come alive once live.</div>';
+  }
+}
+
+function renderChat(msgs) {
+  const box = document.getElementById('chatMessages');
+  box.dataset.loaded = '1';
+  if (!msgs.length) { box.innerHTML = '<div class="chat-empty">No messages yet. Say something.</div>'; return; }
+  const sig = msgs.map(m => m.id).join(',');
+  if (sig === lastChatRender) return; // no change, skip re-render
+  lastChatRender = sig;
+  const atBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 80;
+  box.innerHTML = msgs.map(m => `
+    <div class="msg ${m.handle === myHandle ? 'mine' : ''}">
+      <div class="msg-head"><span class="msg-handle">${escapeHtml(m.handle)}</span><span class="msg-time">${fmtTime(m.ts)}</span></div>
+      <div class="msg-bubble">${escapeHtml(m.text)}</div>
+    </div>`).join('');
+  if (atBottom) box.scrollTop = box.scrollHeight;
+}
+
+async function sendChat() {
+  const input = document.getElementById('chatTextInput');
+  const text = input.value.trim();
+  if (!text || !myHandle) return;
+  input.value = '';
+  try {
+    const res = await fetch(`${API}/chat`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'send', handle: myHandle, text }),
+    });
+    const data = await res.json();
+    renderChat(data.messages || []);
+    const box = document.getElementById('chatMessages');
+    box.scrollTop = box.scrollHeight;
+  } catch (e) {
+    input.value = text; // restore on failure
+  }
+}
+
+function startChatPolling() {
+  loadChat();
+  stopChatPolling();
+  chatTimer = setInterval(loadChat, 4000);
+}
+function stopChatPolling() { if (chatTimer) { clearInterval(chatTimer); chatTimer = null; } }
+
+document.getElementById('chatTextInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); sendChat(); }
+});
+
+// ─────────────────────────────────────────────
+//  PROFILE
+// ─────────────────────────────────────────────
+function updateProfile() {
+  const av = document.getElementById('profileAvatar');
+  const h = document.getElementById('profileHandle');
+  const sub = document.getElementById('profileHandleSub');
+  if (myHandle) {
+    av.textContent = myHandle.replace('@','')[0].toUpperCase();
+    h.textContent = myHandle;
+    sub.textContent = 'Tap to change · ' + myHandle;
+  } else {
+    av.textContent = '?';
+    h.textContent = 'Not in chat yet';
+    sub.textContent = 'Set the name you use in chat';
+  }
+}
+function profileSetHandle() {
+  if (myHandle) changeHandle();
+  else { setTab('chat'); setTimeout(() => document.getElementById('handleInput').focus(), 200); }
+}
+function installHint() {
+  openInfo('📲 Install Dark Matter',
+    'On iPhone: open in Safari → tap Share → "Add to Home Screen".\n\nOn Android: open in Chrome → tap the ⋮ menu → "Install app" / "Add to Home screen".\n\nIt runs full-screen like a native app, no app store needed.');
+}
+
+// ─────────────────────────────────────────────
+//  MODALS
+// ─────────────────────────────────────────────
+function openPost(i) {
+  const p = posts[i];
+  document.getElementById('modalTitle').textContent = p.title;
+  document.getElementById('modalBody').innerHTML = (p.body || '').split('\n\n').map(para =>
+    `<p style="margin-bottom:14px">${escapeHtml(para)}</p>`).join('');
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function openCoinModal(i) {
+  const c = coins[i];
+  document.getElementById('modalTitle').textContent = `${c.name} (${c.sym})`;
+  document.getElementById('modalBody').innerHTML = `
+    <p style="font-family:'Space Mono',monospace;font-size:28px;font-weight:700;color:${c.color};margin-bottom:8px">${fmt(c.price)}</p>
+    <p style="font-size:14px;color:${c.change>=0?'#22C55E':'#EF4444'};margin-bottom:16px">${c.change>=0?'▲':'▼'} ${Math.abs(c.change)}% (24h)</p>
+    <p style="font-size:13px;color:#7B6A86;line-height:1.6">Live price data from the market feed. Full charts, order-book depth, and on-chain analytics are coming in a future update.</p>`;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function openInfo(title, body) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = body.split('\n\n').map(p => `<p style="margin-bottom:14px">${escapeHtml(p)}</p>`).join('');
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modalOverlay')) {
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+}
+
+// ─────────────────────────────────────────────
+//  TAB NAVIGATION
+// ─────────────────────────────────────────────
+const TAB_TITLES = { markets:'Markets', blog:'The Signal', chat:'Chat Room', market:'Marketplace', profile:'Profile' };
+function setTab(name) {
+  document.body.dataset.tab = name;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.tab === name));
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+  document.getElementById('headerTitle').textContent = TAB_TITLES[name] || '';
+  document.querySelector('.scroll-area').scrollTop = 0;
+
+  if (name === 'chat') { refreshChatGate(); if (myHandle) startChatPolling(); }
+  else stopChatPolling();
+  if (name === 'blog') loadPosts();
+  if (name === 'profile') updateProfile();
+}
+
+// ─────────────────────────────────────────────
+//  ADMIN
+// ─────────────────────────────────────────────
+const ADMIN_GATE = '971997';   // soft gate to open the panel; real password is the ANTHROPIC/ADMIN env on the server
+let adminPassword = '';
+let logoTapCount = 0, logoTapTimer = null;
+
+document.getElementById('logo').addEventListener('click', () => {
+  logoTapCount++;
+  clearTimeout(logoTapTimer);
+  logoTapTimer = setTimeout(() => { logoTapCount = 0; }, 800);
+  if (logoTapCount >= 3) { logoTapCount = 0; openPwScreen(); }
+});
+
+function openPwScreen() {
+  document.getElementById('pwScreen').classList.add('open');
+  document.getElementById('pwInput').value = '';
+  setTimeout(() => document.getElementById('pwInput').focus(), 100);
+}
+function closePwScreen() { document.getElementById('pwScreen').classList.remove('open'); }
+
+function checkPassword(val) {
+  if (val.length === 6) {
+    if (val === ADMIN_GATE) {
+      adminPassword = val;            // sent to server to authorize writes
+      closePwScreen();
+      openAdmin();
+    } else {
+      const i = document.getElementById('pwInput');
+      i.style.borderColor = '#EF4444';
+      setTimeout(() => { i.value = ''; i.style.borderColor = '#3A1F4A'; }, 600);
+    }
+  }
+}
+
+function openAdmin() {
+  document.getElementById('adminOverlay').classList.add('open');
+  document.getElementById('adminStatus').textContent = '';
+  buildScheduleSelectors();
+  loadConfig();
+  loadPosts().then(renderAdminPosts);
+}
+function closeAdmin() { document.getElementById('adminOverlay').classList.remove('open'); }
+
+function renderAdminPosts() {
+  const el = document.getElementById('adminPostList');
+  if (!posts.length) { el.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:10px">No posts yet</div>'; return; }
+  el.innerHTML = posts.map(p => `
+    <div class="admin-post-row">
+      <span class="admin-post-title">${escapeHtml(p.title)}</span>
+      <span class="admin-post-tag">${p.tag}</span>
+      <button class="admin-delete" onclick="deletePost('${p.id}')">✕</button>
+    </div>`).join('');
+}
+
+async function deletePost(id) {
+  try {
+    const res = await fetch(`${API}/posts`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'delete', password: adminPassword, id }),
+    });
+    const data = await res.json();
+    posts = data.posts || posts.filter(p => p.id !== id);
+  } catch (e) {
+    posts = posts.filter(p => p.id !== id); // local fallback
+  }
+  buildBlog();
+  renderAdminPosts();
+}
+
+async function generateDailyPost() {
+  const btn = document.getElementById('generateBtn');
+  const icon = document.getElementById('generateIcon');
+  const label = document.getElementById('generateLabel');
+  const status = document.getElementById('adminStatus');
+  btn.disabled = true; icon.textContent = '⏳'; label.textContent = 'Fetching market data...';
+  status.textContent = ''; status.className = 'admin-status';
+
+  let marketData = [];
+  try {
+    const cg = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,solana,ripple,pax-gold&order=market_cap_desc&sparkline=false&price_change_percentage=24h');
+    marketData = await cg.json();
+  } catch (e) {
+    marketData = coins.map(c => ({ symbol: c.sym, name: c.name, current_price: c.price, price_change_percentage_24h: c.change }));
+  }
+
+  label.textContent = 'Writing with AI...'; icon.textContent = '🤖';
+  try {
+    const raw = await callClaude('daily_post', marketData, { slot: currentSlotGuess() });
+    const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    const res = await fetch(`${API}/posts`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'add', password: adminPassword, post: {
+        tag: 'DAILY', title: parsed.title, excerpt: parsed.excerpt, body: parsed.body, read: '2 min', aiGenerated: true,
+      }}),
+    });
+    const data = await res.json();
+    if (data.posts) posts = data.posts;
+    buildBlog(); renderAdminPosts();
+    status.textContent = '✓ Post published to feed'; status.className = 'admin-status success';
+    icon.textContent = '✅'; label.textContent = 'Published!';
+    setTimeout(() => { icon.textContent = '🤖'; label.textContent = 'Generate Market Update Now'; }, 2500);
+  } catch (e) {
+    status.textContent = 'Error — is the Netlify function + API key set up?'; status.className = 'admin-status error';
+    icon.textContent = '🤖'; label.textContent = 'Generate Market Update Now';
+  }
+  btn.disabled = false;
+}
+function currentSlotGuess() {
+  const h = new Date().getHours();
+  return h < 12 ? 'morning' : 'afternoon';
+}
+
+async function clearChat() {
+  const status = document.getElementById('chatModStatus');
+  if (!confirm('Delete ALL chat messages? This cannot be undone.')) return;
+  status.textContent = 'Clearing…'; status.className = 'admin-status';
+  try {
+    const res = await fetch(`${API}/chat`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'clear', password: adminPassword }),
+    });
+    if (!res.ok) throw new Error();
+    lastChatRender = '';
+    status.textContent = '✓ Chat cleared'; status.className = 'admin-status success';
+    if (document.body.dataset.tab === 'chat') loadChat();
+  } catch (e) {
+    status.textContent = 'Error clearing chat'; status.className = 'admin-status error';
+  }
+}
+
+// ── schedule selectors ──
+function hourLabel(h) {
+  const ampm = h < 12 ? 'AM' : 'PM';
+  const hr = h % 12 === 0 ? 12 : h % 12;
+  return `${hr}:00 ${ampm}`;
+}
+function buildScheduleSelectors() {
+  const hours = Array.from({length:24}, (_,h) => `<option value="${h}">${hourLabel(h)}</option>`).join('');
+  document.getElementById('cfgMorning').innerHTML = hours;
+  document.getElementById('cfgAfternoon').innerHTML = hours;
+  document.getElementById('cfgWeeklyHour').innerHTML = hours;
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  document.getElementById('cfgWeeklyDay').innerHTML = days.map(d => `<option value="${d}">${d}</option>`).join('');
+}
+
+async function loadConfig() {
+  let cfg = { morningHour:7, afternoonHour:15, weeklyDay:'Sun', weeklyHour:9, topics:[] };
+  try {
+    const res = await fetch(`${API}/config`);
+    if (res.ok) { const d = await res.json(); if (d.config) cfg = { ...cfg, ...d.config }; }
+  } catch (e) {}
+  document.getElementById('cfgMorning').value = cfg.morningHour;
+  document.getElementById('cfgAfternoon').value = cfg.afternoonHour;
+  document.getElementById('cfgWeeklyDay').value = cfg.weeklyDay;
+  document.getElementById('cfgWeeklyHour').value = cfg.weeklyHour;
+  document.getElementById('cfgTopics').value = (cfg.topics || []).join('\n');
+}
+
+async function saveConfig() {
+  const status = document.getElementById('cfgStatus');
+  const config = {
+    morningHour: parseInt(document.getElementById('cfgMorning').value, 10),
+    afternoonHour: parseInt(document.getElementById('cfgAfternoon').value, 10),
+    weeklyDay: document.getElementById('cfgWeeklyDay').value,
+    weeklyHour: parseInt(document.getElementById('cfgWeeklyHour').value, 10),
+    topics: document.getElementById('cfgTopics').value.split('\n').map(s => s.trim()).filter(Boolean),
+  };
+  status.textContent = 'Saving…'; status.className = 'admin-status';
+  try {
+    const res = await fetch(`${API}/config`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'save', password: adminPassword, config }),
+    });
+    if (!res.ok) throw new Error();
+    status.textContent = '✓ Schedule saved'; status.className = 'admin-status success';
+  } catch (e) {
+    status.textContent = 'Error — backend not reachable'; status.className = 'admin-status error';
+  }
+}
+
+// ─────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────
+updateProfile();
+refreshChatGate();
+loadPosts();
+fetchMarkets().then(() => fetchAIInsight());
+setInterval(fetchMarkets, 60000); // live price refresh every 60s
+</script>
+</body>
+</html>

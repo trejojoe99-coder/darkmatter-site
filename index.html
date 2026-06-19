@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="theme-color" content="#060406"/>
+<meta name="description" content="Dark Matter — crypto intelligence for people who don't need hand-holding. AI market updates, anonymous chat, P2P marketplace. No KYC. No noise."/>
+<title>Dark Matter — Crypto Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --void: #07050A;
+  --surface: #0E0A12;
+  --surface2: #181022;
+  --border: #2A1F33;
+  --red: #FF2EC4;
+  --red-dim: #B026FF;
+  --red-glow: rgba(176,38,255,0.18);
+  --text: #F4EEF6;
+  --muted: #7B6A86;
+  --faint: #2E1F38;
+  --green: #22C55E;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--void);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* ── NOISE TEXTURE ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.6;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(to bottom, rgba(6,4,6,0.95), transparent);
+}
+
+.nav-logo {
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.5px;
+  color: var(--text);
+  text-decoration: none;
+}
+.nav-logo em {
+  font-style: normal;
+  color: var(--red);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  list-style: none;
+}
+.nav-links a {
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+  letter-spacing: 0.3px;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--text); }
+
+.nav-cta {
+  background: var(--red) !important;
+  color: white !important;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  transition: opacity 0.2s !important;
+}
+.nav-cta:hover { opacity: 0.85 !important; }
+
+@media (max-width: 600px) {
+  nav { padding: 16px 20px; }
+  .nav-links { display: none; }
+}
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 120px 24px 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ambient red glow behind hero */
+.hero::after {
+  content: '';
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(ellipse, rgba(176,38,255,0.12) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero-eyebrow {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--red);
+  text-transform: uppercase;
+  margin-bottom: 28px;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.hero-eyebrow::before,
+.hero-eyebrow::after {
+  content: '';
+  width: 30px;
+  height: 1px;
+  background: var(--red-dim);
+}
+
+.hero-title {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(48px, 10vw, 96px);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -3px;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 32px;
+}
+
+.hero-title .line1 { color: var(--text); display: block; }
+.hero-title .line2 {
+  display: block;
+  background: linear-gradient(135deg, #FF2EC4 0%, #FF6BE6 50%, #B026FF 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  font-size: 17px;
+  color: var(--muted);
+  max-width: 480px;
+  line-height: 1.65;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 48px;
+  font-weight: 400;
+}
+.hero-sub strong { color: var(--text); font-weight: 500; }
+
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.btn-primary {
+  background: var(--red);
+  color: white;
+  border: none;
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.15s, opacity 0.15s, box-shadow 0.15s;
+  box-shadow: 0 0 30px rgba(176,38,255,0.3);
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 50px rgba(176,38,255,0.45);
+  opacity: 0.92;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: border-color 0.2s, color 0.2s;
+}
+.btn-ghost:hover { border-color: var(--muted); color: var(--text); }
+
+/* install badge */
+.install-hint {
+  margin-top: 20px;
+  font-size: 12px;
+  color: var(--faint);
+  font-family: 'Space Mono', monospace;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.install-hint span { color: var(--muted); }
+
+/* ── TICKER ── */
+.ticker-section {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  padding: 14px 0;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+.ticker-track {
+  display: flex;
+  gap: 40px;
+  animation: tickerMove 25s linear infinite;
+  white-space: nowrap;
+}
+@keyframes tickerMove {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.tick-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.tick-sym { color: var(--muted); }
+.tick-price { color: var(--text); font-weight: 700; }
+.tick-up { color: var(--green); }
+.tick-down { color: var(--red); }
+.tick-dot { color: var(--faint); font-size: 8px; }
+
+/* ── SECTION BASE ── */
+section {
+  position: relative;
+  z-index: 1;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+@media (max-width: 600px) { .container { padding: 0 20px; } }
+
+/* ── WHAT IS IT ── */
+.what-section {
+  padding: 100px 0;
+}
+
+.section-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--red);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.what-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+@media (max-width: 768px) {
+  .what-grid { grid-template-columns: 1fr; gap: 40px; }
+}
+
+.what-headline {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -1px;
+  margin-bottom: 20px;
+}
+
+.what-body {
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.75;
+  margin-bottom: 16px;
+}
+.what-body strong { color: var(--text); font-weight: 500; }
+
+/* app mockup */
+.mockup-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.phone-frame {
+  width: 240px;
+  height: 480px;
+  background: var(--surface);
+  border-radius: 36px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  position: relative;
+  box-shadow:
+    0 0 0 1px var(--faint),
+    0 40px 80px rgba(0,0,0,0.6),
+    0 0 60px rgba(176,38,255,0.08);
+}
+
+.phone-screen {
+  padding: 20px 14px 10px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.phone-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.phone-logo {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--red);
+}
+.phone-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--red);
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.phone-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+.phone-card-label { font-size: 8px; color: var(--muted); font-family: 'Space Mono', monospace; letter-spacing: 1px; margin-bottom: 4px; }
+.phone-card-price { font-family: 'Space Mono', monospace; font-size: 16px; font-weight: 700; color: var(--text); }
+.phone-card-change { font-size: 10px; color: var(--green); margin-top: 2px; }
+
+.phone-ai {
+  background: linear-gradient(135deg, rgba(176,38,255,0.2), rgba(176,38,255,0.08));
+  border: 1px solid rgba(176,38,255,0.3);
+  border-radius: 12px;
+  padding: 10px 12px;
+  flex: 1;
+}
+.phone-ai-label { font-size: 8px; color: var(--red); font-family: 'Space Mono', monospace; letter-spacing: 1px; margin-bottom: 6px; }
+.phone-ai-text { font-size: 9px; color: var(--muted); line-height: 1.6; }
+
+.phone-nav {
+  display: flex;
+  justify-content: space-around;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+  margin-top: auto;
+}
+.phone-nav-item { font-size: 14px; opacity: 0.5; }
+.phone-nav-item.active { opacity: 1; }
+
+/* ── FEATURES ── */
+.features-section { padding: 100px 0; }
+
+.features-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+.features-title {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(26px, 4vw, 38px);
+  font-weight: 700;
+  letter-spacing: -1px;
+  line-height: 1.2;
+  margin-bottom: 14px;
+}
+.features-sub { font-size: 15px; color: var(--muted); }
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+@media (max-width: 768px) {
+  .features-grid { grid-template-columns: 1fr; }
+}
+
+.feat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.feat-card:hover {
+  border-color: var(--red-dim);
+  transform: translateY(-2px);
+}
+.feat-card.live { border-color: rgba(34,197,94,0.3); }
+.feat-card.soon { opacity: 0.7; }
+
+.feat-glow {
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  background: var(--red);
+  opacity: 0.04;
+  filter: blur(30px);
+}
+
+.feat-icon {
+  font-size: 28px;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.feat-status {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  padding: 3px 8px;
+  border-radius: 5px;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+.status-live { background: rgba(34,197,94,0.1); color: var(--green); }
+.status-soon { background: var(--faint); color: var(--muted); }
+.status-building { background: rgba(176,38,255,0.1); color: var(--red); }
+
+.feat-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  letter-spacing: -0.3px;
+}
+.feat-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+/* ── ROADMAP ── */
+.roadmap-section { padding: 100px 0; }
+
+.roadmap-header {
+  margin-bottom: 60px;
+}
+.roadmap-title {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(26px, 4vw, 38px);
+  font-weight: 700;
+  letter-spacing: -1px;
+  margin-bottom: 14px;
+}
+.roadmap-sub { font-size: 15px; color: var(--muted); max-width: 500px; }
+
+.roadmap-track {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+}
+.roadmap-track::before {
+  content: '';
+  position: absolute;
+  left: 19px;
+  top: 10px;
+  bottom: 10px;
+  width: 1px;
+  background: linear-gradient(to bottom, var(--red), var(--faint) 60%, transparent);
+}
+
+.roadmap-item {
+  display: flex;
+  gap: 24px;
+  padding-bottom: 40px;
+  position: relative;
+}
+.roadmap-item:last-child { padding-bottom: 0; }
+
+.roadmap-node {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+.roadmap-node.done {
+  border-color: var(--green);
+  background: rgba(34,197,94,0.1);
+}
+.roadmap-node.active {
+  border-color: var(--red);
+  background: rgba(176,38,255,0.1);
+  box-shadow: 0 0 16px rgba(176,38,255,0.2);
+}
+
+.roadmap-content { padding-top: 6px; }
+.roadmap-phase {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.roadmap-name {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  letter-spacing: -0.3px;
+}
+.roadmap-items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.roadmap-bullet {
+  font-size: 13px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.roadmap-bullet::before {
+  content: '→';
+  color: var(--red-dim);
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+}
+
+/* ── CTA ── */
+.cta-section {
+  padding: 100px 0 120px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.cta-section::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 800px; height: 400px;
+  background: radial-gradient(ellipse at bottom, rgba(176,38,255,0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.cta-title {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(32px, 6vw, 60px);
+  font-weight: 700;
+  letter-spacing: -2px;
+  line-height: 1.1;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+.cta-title em {
+  font-style: normal;
+  color: var(--red);
+}
+
+.cta-sub {
+  font-size: 16px;
+  color: var(--muted);
+  margin-bottom: 40px;
+  position: relative;
+  z-index: 1;
+}
+
+.cta-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+/* install steps */
+.install-steps {
+  margin-top: 48px;
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+.install-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.step-num {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--red);
+  flex-shrink: 0;
+}
+.step-arrow { color: var(--faint); font-size: 12px; }
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 32px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+}
+@media (max-width: 600px) {
+  footer { flex-direction: column; gap: 16px; text-align: center; padding: 24px 20px; }
+}
+.footer-logo {
+  font-family: 'Space Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+.footer-logo span { color: var(--red); }
+.footer-copy { font-size: 12px; color: var(--muted); }
+.footer-links { display: flex; gap: 24px; }
+.footer-links a {
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.footer-links a:hover { color: var(--text); }
+
+/* ── DIVIDER ── */
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+}
+
+/* ── SCROLL REVEAL ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">Dark<em>Matter</em></a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="darkmatter.html" class="nav-cta">Open App →</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">Crypto Intelligence</div>
+  <h1 class="hero-title">
+    <span class="line1">DARK</span>
+    <span class="line2">MATTER</span>
+  </h1>
+  <p class="hero-sub">
+    Market intel, AI-written daily updates, anonymous chat, and a P2P marketplace — all in one place. <strong>No KYC. No hand-holding. No noise.</strong>
+  </p>
+  <div class="hero-actions">
+    <a href="darkmatter.html" class="btn-primary">⚡ Open the App</a>
+    <a href="#features" class="btn-ghost">See what's inside</a>
+  </div>
+  <div class="install-hint">
+    <span>Open in Safari or Chrome</span> → Share → <span>Add to Home Screen</span>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-section">
+  <div class="ticker-track" id="heroTicker"></div>
+</div>
+
+<!-- WHAT IS IT -->
+<section class="what-section">
+  <div class="container">
+    <div class="what-grid">
+      <div class="reveal">
+        <div class="section-label">What it is</div>
+        <h2 class="what-headline">Built for people who actually understand crypto</h2>
+        <p class="what-body">
+          Dark Matter is a <strong>crypto super app</strong> — starting with real-time market data and AI-powered daily briefings, and growing into an anonymous communication and commerce layer.
+        </p>
+        <p class="what-body">
+          No ads. No tracking. No corporate tone. Just the signal, filtered by AI, delivered fast.
+        </p>
+        <p class="what-body">
+          Install it on your phone like an app. Use it daily like a tool. <strong>It's free.</strong>
+        </p>
+      </div>
+      <div class="mockup-wrap reveal">
+        <div class="phone-frame">
+          <div class="phone-screen">
+            <div class="phone-bar">
+              <div class="phone-logo">DarkMatter</div>
+              <div class="phone-dot"></div>
+            </div>
+            <div class="phone-card">
+              <div class="phone-card-label">BTC / USD</div>
+              <div class="phone-card-price">$104,820</div>
+              <div class="phone-card-change">▲ 2.4% today</div>
+            </div>
+            <div class="phone-card">
+              <div class="phone-card-label">SOL / USD</div>
+              <div class="phone-card-price">$178.42</div>
+              <div class="phone-card-change">▲ 5.8% today</div>
+            </div>
+            <div class="phone-ai">
+              <div class="phone-ai-label">● DM Market Intel</div>
+              <div class="phone-ai-text">SOL leads the charge as Firedancer hype builds. BTC holding $104K support — bulls still in control. Watch ETH for a rebound setup into the weekend...</div>
+            </div>
+            <div class="phone-nav">
+              <div class="phone-nav-item active">📊</div>
+              <div class="phone-nav-item">✍️</div>
+              <div class="phone-nav-item">💬</div>
+              <div class="phone-nav-item">🛒</div>
+              <div class="phone-nav-item">👤</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- FEATURES -->
+<section class="features-section" id="features">
+  <div class="container">
+    <div class="features-header reveal">
+      <div class="section-label">Features</div>
+      <h2 class="features-title">Everything in one place.<br/>Nothing you don't need.</h2>
+      <p class="features-sub">Built in phases. The core is live now. The rest is being built in public.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feat-card live reveal">
+        <div class="feat-glow"></div>
+        <span class="feat-icon">📊</span>
+        <span class="feat-status status-live">LIVE NOW</span>
+        <div class="feat-title">Live Market Feed</div>
+        <div class="feat-desc">Real-time prices for BTC, ETH, SOL, XRP, and PAXG with 24h sparklines and instant coin detail.</div>
+      </div>
+
+      <div class="feat-card live reveal">
+        <div class="feat-glow"></div>
+        <span class="feat-icon">🤖</span>
+        <span class="feat-status status-live">LIVE NOW</span>
+        <div class="feat-title">AI Daily Briefings</div>
+        <div class="feat-desc">Claude writes a sharp daily market update every morning — top gainers, losers, and what to watch. Trader tone, no filler.</div>
+      </div>
+
+      <div class="feat-card live reveal">
+        <div class="feat-glow"></div>
+        <span class="feat-icon">✍️</span>
+        <span class="feat-status status-live">LIVE NOW</span>
+        <div class="feat-title">Crypto Blog</div>
+        <div class="feat-desc">Deep dives on self-custody, on-chain alpha, and market structure — written for people who already know the basics.</div>
+      </div>
+
+      <div class="feat-card soon reveal">
+        <div class="feat-glow"></div>
+        <span class="feat-icon">💬</span>
+        <span class="feat-status status-building">BUILDING</span>
+        <div class="feat-title">Anonymous Chat</div>
+        <div class="feat-desc">End-to-end encrypted messaging. Drop a handle, no phone number, no email, no KYC. Talk freely.</div>
+      </div>
+
+      <div class="feat-card soon reveal">
+        <div class="feat-glow"></div>
+        <span class="feat-icon">🛒</span>
+        <span class="feat-status status-soon">COMING SOON</span>
+        <div class="feat-title">P2P Marketplace</div>
+        <div class="feat-desc">Buy, sell, and trade goods and services. Pay in crypto. No middlemen, no ID verification, no chargebacks.</div>
+      </div>
+
+      <div class="feat-card soon reveal">
+        <div class="feat-glow"></div>
+        <span class="feat-icon">🪙</span>
+        <span class="feat-status status-soon">COMING SOON</span>
+        <div class="feat-title">Native Token</div>
+        <div class="feat-desc">The Dark Matter token will power marketplace fees, unlock premium features, and reward early users.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- ROADMAP -->
+<section class="roadmap-section" id="roadmap">
+  <div class="container">
+    <div class="roadmap-header reveal">
+      <div class="section-label">Roadmap</div>
+      <h2 class="roadmap-title">Built in public.<br/>Shipped in phases.</h2>
+      <p class="roadmap-sub">No promises, no vaporware. Each phase ships before the next one starts.</p>
+    </div>
+
+    <div class="roadmap-track">
+
+      <div class="roadmap-item reveal">
+        <div class="roadmap-node done">✓</div>
+        <div class="roadmap-content">
+          <div class="roadmap-phase">Phase 1 — Complete</div>
+          <div class="roadmap-name">Foundation</div>
+          <div class="roadmap-items">
+            <div class="roadmap-bullet">Live market prices + sparklines</div>
+            <div class="roadmap-bullet">AI-powered market intel feed</div>
+            <div class="roadmap-bullet">Crypto blog with daily updates</div>
+            <div class="roadmap-bullet">PWA — installs on any phone</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="roadmap-item reveal">
+        <div class="roadmap-node active">◎</div>
+        <div class="roadmap-content">
+          <div class="roadmap-phase">Phase 2 — In Progress</div>
+          <div class="roadmap-name">Communication</div>
+          <div class="roadmap-items">
+            <div class="roadmap-bullet">Anonymous encrypted chat rooms</div>
+            <div class="roadmap-bullet">No-KYC user handles</div>
+            <div class="roadmap-bullet">Push notifications</div>
+            <div class="roadmap-bullet">CoinGecko live price integration</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="roadmap-item reveal">
+        <div class="roadmap-node">○</div>
+        <div class="roadmap-content">
+          <div class="roadmap-phase">Phase 3 — Q3 2025</div>
+          <div class="roadmap-name">Marketplace</div>
+          <div class="roadmap-items">
+            <div class="roadmap-bullet">P2P listings — goods and services</div>
+            <div class="roadmap-bullet">Crypto escrow payments</div>
+            <div class="roadmap-bullet">Reputation system without identity</div>
+            <div class="roadmap-bullet">Mobile app (iOS + Android)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="roadmap-item reveal">
+        <div class="roadmap-node">○</div>
+        <div class="roadmap-content">
+          <div class="roadmap-phase">Phase 4 — Q4 2025</div>
+          <div class="roadmap-name">Token Launch</div>
+          <div class="roadmap-items">
+            <div class="roadmap-bullet">Dark Matter token — native currency</div>
+            <div class="roadmap-bullet">Marketplace fee discounts for holders</div>
+            <div class="roadmap-bullet">Early user reward airdrop</div>
+            <div class="roadmap-bullet">Staking and governance</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-title reveal">
+      Get in early.<br/>
+      <em>It's free.</em>
+    </h2>
+    <p class="cta-sub reveal">Install it now. The market doesn't wait.</p>
+    <div class="cta-actions reveal">
+      <a href="darkmatter.html" class="btn-primary">⚡ Open Dark Matter</a>
+      <a href="#roadmap" class="btn-ghost">View Roadmap</a>
+    </div>
+
+    <div class="install-steps reveal">
+      <div class="install-step">
+        <div class="step-num">1</div>
+        Open in Safari or Chrome
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="install-step">
+        <div class="step-num">2</div>
+        Tap Share
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="install-step">
+        <div class="step-num">3</div>
+        Add to Home Screen
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="install-step">
+        <div class="step-num">4</div>
+        Done. It's on your phone.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Dark<span>Matter</span></div>
+  <div class="footer-copy">© 2025 Dark Matter. Built in Chicago.</div>
+  <div class="footer-links">
+    <a href="darkmatter.html">App</a>
+    <a href="#roadmap">Roadmap</a>
+    <a href="#features">Features</a>
+  </div>
+</footer>
+
+<script>
+// ── TICKER ──
+const ticks = [
+  { sym: 'BTC', price: '$104,820', change: '▲ 2.4%', up: true },
+  { sym: 'ETH', price: '$3,841',   change: '▼ 1.2%', up: false },
+  { sym: 'SOL', price: '$178.42',  change: '▲ 5.8%', up: true },
+  { sym: 'XRP', price: '$2.43',    change: '▲ 0.9%', up: true },
+  { sym: 'PAXG', price: '$3,402',  change: '▲ 0.3%', up: true },
+  { sym: 'BNB',  price: '$614',    change: '▲ 1.1%', up: true },
+  { sym: 'AVAX', price: '$38.20',  change: '▼ 0.8%', up: false },
+];
+
+function buildTicker() {
+  const doubled = [...ticks, ...ticks];
+  const el = document.getElementById('heroTicker');
+  el.innerHTML = doubled.map((t, i) =>
+    `<div class="tick-item">
+      <span class="tick-sym">${t.sym}</span>
+      <span class="tick-price">${t.price}</span>
+      <span class="${t.up ? 'tick-up' : 'tick-down'}">${t.change}</span>
+      ${i < doubled.length - 1 ? '<span class="tick-dot">●</span>' : ''}
+    </div>`
+  ).join('');
+}
+buildTicker();
+
+// ── SCROLL REVEAL ──
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ── PWA INSTALL PROMPT ──
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+});
+
+document.querySelectorAll('.btn-primary').forEach(btn => {
+  if (btn.textContent.includes('Open')) {
+    btn.addEventListener('click', async (e) => {
+      if (deferredPrompt) {
+        e.preventDefault();
+        deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+        deferredPrompt = null;
+      }
+    });
+  }
+});
+</script>
+</body>
+</html>
