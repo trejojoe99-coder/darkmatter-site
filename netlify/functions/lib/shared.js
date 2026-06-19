@@ -40,11 +40,11 @@ async function writeJSON(key, value) {
   await store().setJSON(key, value);
 }
 
-// Owner password — set ADMIN_PASSWORD in Netlify env. Falls back to the
-// in-app gate code so it works out of the box (change both before launch).
+// Owner auth. The admin code lives ONLY in the ADMIN_PASSWORD env var (never in
+// the repo). If it isn't set, all admin writes are denied.
 function adminOk(password) {
-  const expected = process.env.ADMIN_PASSWORD || "971997";
-  return password && String(password) === expected;
+  const expected = process.env.ADMIN_PASSWORD;
+  return !!expected && !!password && String(password) === String(expected);
 }
 
 // Live prices, server-side (used by scheduler + manual generation)

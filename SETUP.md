@@ -27,13 +27,13 @@ In Netlify → **Site configuration → Environment variables**, add:
 | Key | Value | Used for |
 |-----|-------|----------|
 | `ANTHROPIC_API_KEY` | your Anthropic API key | AI insights, daily briefs, weekly blog |
-| `ADMIN_PASSWORD` | a secret you choose | authorizes admin writes (delete posts, clear chat, save schedule) |
+| `ADMIN_PASSWORD` | a **6-digit code** you choose | the admin code; validated on every admin write |
 
-> The in-app admin gate code is `971997` (triple-tap the logo, or Profile →
-> Admin access). Change it in `darkmatter.html` (`ADMIN_GATE`). For real
-> protection, the **server** checks `ADMIN_PASSWORD` on every write — set it.
-> If you don't set `ADMIN_PASSWORD`, the server falls back to `971997` so it
-> still works out of the box.
+> To open the admin panel: triple-tap the **DarkMatter** logo (or Profile →
+> Admin access) and enter your 6-digit `ADMIN_PASSWORD`. No password is stored
+> in the code — it lives only in this env var. If `ADMIN_PASSWORD` isn't set,
+> all admin actions (generate/delete posts, clear chat, save schedule) are
+> denied. Use a 6-digit numeric code (the entry screen accepts 6 digits).
 
 ## 2. Deploy
 

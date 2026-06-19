@@ -1181,7 +1181,8 @@ function setTab(name) {
 // ─────────────────────────────────────────────
 //  ADMIN
 // ─────────────────────────────────────────────
-const ADMIN_GATE = '971997';   // soft gate to open the panel; real password is the ANTHROPIC/ADMIN env on the server
+// No password lives in this file. The 6-digit code you type is sent to the
+// server and validated against the ADMIN_PASSWORD env var on every write.
 let adminPassword = '';
 let logoTapCount = 0, logoTapTimer = null;
 
@@ -1200,16 +1201,12 @@ function openPwScreen() {
 function closePwScreen() { document.getElementById('pwScreen').classList.remove('open'); }
 
 function checkPassword(val) {
+  // Open the panel optimistically once a 6-digit code is entered; the server
+  // rejects any write with the wrong code (you'll see "Unauthorized").
   if (val.length === 6) {
-    if (val === ADMIN_GATE) {
-      adminPassword = val;            // sent to server to authorize writes
-      closePwScreen();
-      openAdmin();
-    } else {
-      const i = document.getElementById('pwInput');
-      i.style.borderColor = '#EF4444';
-      setTimeout(() => { i.value = ''; i.style.borderColor = '#3A1F4A'; }, 600);
-    }
+    adminPassword = val;
+    closePwScreen();
+    openAdmin();
   }
 }
 
